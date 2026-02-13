@@ -45,7 +45,7 @@ export class PedidosService {
   }
 
   async create(dto: CreatePedidoDto): Promise<Pedido> {
-    return this.dataSource.transaction(async (manager) => {
+    return this.dataSource.transaction<Pedido>(async (manager) => {
       // Validate client exists
       const cliente = await manager.findOne(Cliente, {
         where: { id: dto.clienteId },
@@ -104,9 +104,10 @@ export class PedidosService {
       }
       await manager.save(PedidoItem, itens);
 
-      return this.pedidosRepository.findOne({
+      const result = await this.pedidosRepository.findOne({
         where: { id: savedPedido.id },
       });
+      return result!;
     });
   }
 
