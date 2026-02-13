@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: crud_postgres
+    restart: unless-stopped
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: crud_user
+      POSTGRES_PASSWORD: crud_pass
+      POSTGRES_DB: crud_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: crud_backend
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USERNAME: crud_user
+      DB_PASSWORD: crud_pass
+      DB_DATABASE: crud_db
+      JWT_SECRET: super-secret-change-in-production
+      JWT_EXPIRES_IN: 1d
+    depends_on:
+      - db
+    volumes:
+      - ./uploads:/app/uploads
+
+volumes:
+  pgdata:
